@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Loading from "./Loading";
 
 const Cats = () => {
   const [cat, setCat] = useState({
@@ -23,7 +24,7 @@ const Cats = () => {
     fetchCats();
   }, []);
   const {url } = cat;
-  return <div>{url ? <img src={url} alt="" /> : 'Loading...'}</div>;
+  return <div>{url ? <img className="catImg" src={url} alt="" /> : <Loading />}</div>;
 };
 
 export default Cats;
