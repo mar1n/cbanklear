@@ -1,30 +1,40 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import Loading from "./Loading";
+import ApiCall from "../utils/ApiCall";
 
 const Cats = () => {
   const [cat, setCat] = useState({
-    url: "",
+    currentPage: ""
   });
+
+  const [kittens, setKittens] = useState([]);
   useEffect(() => {
-    console.log("useeffect is in this componenet");
     async function fetchCats() {
-      const { data: ourResult } = await axios.get(
-        "https://api.thecatapi.com/v1/images/search",
-        {
-          headers: {
-            "x-api-key": "972da10d-ef46-4937-9b57-6aca9a67fae0",
-          },
-        }
-      );
-      const [result] = ourResult;
-      const {url} = result;
-      setCat({ url });
+      const {ourResult, currentPage } = await ApiCall(100);
+      setCat({ currentPage });
+      setKittens(ourResult);
     }
     fetchCats();
   }, []);
-  const {url } = cat;
-  return <div>{url ? <img className="catImg" src={url} alt="" /> : <Loading />}</div>;
+  const nextPage = async () => {
+    const { currentPage } = cat;
+    
+    const {ourResult } = await ApiCall(parseInt(currentPage) + 1);
+    setCat({ currentPage: parseInt(currentPage) + 1 });
+    setKittens(ourResult);
+  };
+  const threeKittens = () => {
+    return kittens.map(({url}, index) => {
+      return <img key={index} className="catImg" src={url} alt="" />
+    })
+  }
+  return (
+    <div>
+      {kittens.length ? threeKittens() : <Loading />}
+      <br/>
+      <button onClick={nextPage}>Next page</button>
+    </div>
+  );
 };
 
 export default Cats;
